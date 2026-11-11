@@ -49,13 +49,11 @@ Model calls tăng từ 48 lên 52 do các lượt sửa câu trả lời. Token 
 3. So sánh điểm tổng trước/sau: 93.95 → 98.82; nhắc rõ đây là kết quả của một lượt eval.
 4. Kể lỗi hồi quy H7: phần bonus làm `get_status` mất tên provider, nên kiểm tra timeout không chạy và điểm tụt xuống 70. Phát hiện được nhờ thiếu sự kiện validation trong trace; đã sửa và thêm test hồi quy.
 
-**Lưu ý nộp (TODO trước khi nộp):** `eval_bonus.json` hiện tại (96.6) được chạy trước khi thêm quy tắc URL cho B9. Chạy lại `python evals/run_evals.py --bonus --output eval_bonus.json`, cập nhật số liệu bonus bên dưới, rồi xóa dòng lưu ý này.
-
 ## Bonus tùy chọn
 
 - Mở rộng agent để lấy schema và system prompt từ `tools` khi có, giữ fallback cho bài chính. Các quy tắc bổ sung về 429, lỗi tham số, pagination và dữ liệu nhiễu nằm trong `BONUS_EXTRA_RULES` của `agent.py` và được ghép vào `tools.system_prompt`; không sửa file tools do lab cung cấp.
 - Xử lý 429 bằng observation cho model, đọc `Retry-After` và dừng yêu cầu sau tối đa 3 lần gọi/provider; không diễn giải 429 là outage.
 - Giữ trace đầy đủ nhưng loại danh sách `distractors` giả lập khỏi nội dung gửi model. Dùng `next_offset` theo yêu cầu timeline; hỏi model đọc chi tiết incident mới nhất khi câu hỏi yêu cầu.
 - Test offline: `tests/` 39 test (gồm 2 test hồi quy mới) và `bonus/` 3 test đều qua khi chạy với `PYTHONUTF8=1`. Trên Windows nếu không đặt biến này, 3 test của lab lỗi encoding vì code lab đọc file không chỉ định UTF-8; lỗi này không liên quan tới agent.
-- `eval_bonus.json` (lượt sau các sửa của bài chính): 10/10 case được chấm, 96.6/100, tương đương 14.49/15. B1–B8 đạt 100, B10 đạt 96. B9 chỉ được 70: câu hỏi về Linear và Slack (không có tool), agent không bịa trạng thái nhưng tự đưa `status.linear.app` và `status.slack.com` từ hiểu biết sẵn có của model, không phải từ kết quả tool. Đã thêm quy tắc vào `BONUS_EXTRA_RULES`: chỉ đưa URL xuất hiện trong kết quả tool, không đưa link cho provider không có tool. Quy tắc này chỉ áp dụng cho bộ tool bonus, nên không ảnh hưởng `eval_after.json`.
+- `eval_bonus.json` (lượt sau các sửa của bài chính): 10/10 case được chấm, 96.6/100, tương đương 14.49/15. B1–B8 đạt 100, B10 đạt 96. B9 chỉ được 70: câu hỏi về Linear và Slack (không có tool), agent không bịa trạng thái nhưng tự đưa `status.linear.app` và `status.slack.com` từ hiểu biết sẵn có của model, không phải từ kết quả tool. Đã thêm quy tắc vào `BONUS_EXTRA_RULES`: chỉ đưa URL xuất hiện trong kết quả tool, không đưa link cho provider không có tool. Quy tắc này chỉ áp dụng cho bộ tool bonus, nên không ảnh hưởng `eval_after.json`. `eval_bonus.json` được chạy trước khi thêm quy tắc này, nên chưa phản ánh tác dụng của nó.
 - Lượt bonus trước đó (98.3/100, 14.74/15) chạy trên phiên bản agent cũ, trước khi sửa lỗi `get_status`. Điểm giữa các lượt dao động; một lượt không chứng minh độ ổn định.
